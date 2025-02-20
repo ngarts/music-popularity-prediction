@@ -1,0 +1,11 @@
+id,name,artists,danceability,energy,tempo,valence,loudness,speechiness,instrumentalness,acousticness,mode,key,duration_ms,popularity
+d5c94258-1d2f-4278-a8a4-1b30bcdd63fd,Blinding Lights,The Weeknd,0.514,0.73,171.005,0.334,-5.934,0.0598,0.0,0.00146,1,1,200040,0
+5c87a924-49e4-46ba-930c-0e6c86428778,Shape of You,Ed Sheeran,0.825,0.652,95.977,0.931,-3.183,0.0802,0.0,0.581,1,11,233713,0
+bfb134b7-64c8-406c-a0a3-5da69bb1bb07,Levitating,Dua Lipa,0.7,0.8,103.98,0.909,-3.876,0.0598,0.0,0.307,1,6,203064,0
+8c9f3198-2cf0-4932-99d4-755f259f284a,Peaches,Justin Bieber;Daniel Caesar;Giveon,0.755,0.73,90.02,0.729,-4.196,0.0454,0.0,0.101,1,0,198929,0
+6c5b9679-e5b2-434e-bc16-f8f996e9172d,Save Your Tears,The Weeknd,0.75,0.73,118.105,0.676,-3.196,0.0602,0.0,0.381,1,0,215627,0
+438b0768-30e1-407f-9cd7-842b00345135,Good 4 U,Olivia Rodrigo,0.55,0.85,169.951,0.5,-5.934,0.0598,0.0,0.00146,1,1,178040,0
+4280f72b-24c0-4f54-a46c-f05d5dfe6557,Stay,The Kid LAROI;Justin Bieber,0.65,0.85,170.123,0.7,-4.5,0.046,0.0,0.02,1,11,141805,0
+cc6abe70-078c-4beb-b64f-eba0154020a7,Montero (Call Me By Your Name),Lil Nas X,0.75,0.65,180.045,0.6,-3.8,0.1,0.0,0.15,1,5,137000,0
+a6bfdbeb-166c-49ba-90b3-7f2310e0b865,Kiss Me More,Doja Cat;SZA,0.68,0.75,111.99,0.8,-4.2,0.05,0.0,0.1,1,8,208000,0
+fa6a1ab1-7057-4eae-aa32-964bbed3a248,Drivers License,Olivia Rodrigo,0.53,0.55,144.1,0.33,-6.5,0.04,0.0,0.3,1,10,242000,0

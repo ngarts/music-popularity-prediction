@@ -169,3 +169,12 @@ cython_debug/
 
 # PyPI configuration file
 .pypirc
+
+# data
+
+data/artists.csv
+data/dict_artists.json
+data/extracted_features.csv
+data/music_analysis.duckdb
+data/tracks.csv
+data/tracks_cleaned.csv
