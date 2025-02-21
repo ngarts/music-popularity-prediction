@@ -12,21 +12,39 @@ The project follows an **ETL (Extract, Transform, Load) pipeline**, performing d
 ## 💂️ Project Structure
 
 📦 music-popularity-prediction
+
 ├── 📁 data                 # Dataset storage
-│   ├── new_tracks.csv      # Tracks for prediction
+
+│   ├── 📁 predict          # Predict Dataset storage
+
+│       ├── new_tracks.csv  # Tracks for prediction
+
 ├── 📁 models               # Trained models
+
 │   ├── nn_model.keras      # Trained Neural Network model
+
 │   ├── scaler.pkl          # Scaler for feature normalization
+
 ├── 📁 scripts              # Core scripts for data processing
+
 │   ├── extract.py          # Extracts dataset from Kaggle
+
 │   ├── transform.py        # Cleans and preprocesses data
+
 │   ├── load.py             # Loads data into DuckDB
+
 │   ├── train.py            # Trains the neural network
+
 │   ├── predict.py          # Predicts popularity of new tracks
+
 │   ├── visualize.py        # Generates visual insights
-│   ├── pipeline_train.py   # Starts pipeline to train the model
-│   ├── pipeline_predict.py # Starts pipeline to predict popularity for new songs
+
+│   ├── train_pl.py         # Starts pipeline to train the model
+
+│   ├── predict_pl.py       # Starts pipeline to predict popularity for new songs
+
 ├── 📄 requirements.txt     # Dependencies
+
 ├── 📄 README.md            # Project documentation
 
 ## 🚀 Workflows
@@ -110,15 +128,15 @@ source venv/bin/activate # On Windows: venv\\Scripts\\activate
 
 pip install -r requirements.txt
 
-## 🔥 Usage
+## 🚀 How to Run the Pipelines
 
 ### 1️⃣ Train the model
 
-python scripts/pipeline_train.py
+python scripts/train_pl.py
 
 ### 2️⃣ Predict popularity for new songs
 
-python scripts/pipeline_predict.py
+python scripts/predict_pl.py
 
 ## 📈 Results & Visualizations
 

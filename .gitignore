@@ -172,9 +172,7 @@ cython_debug/
 
 # data
 
-data/artists.csv
-data/dict_artists.json
-data/extracted_features.csv
-data/music_analysis.duckdb
-data/tracks.csv
-data/tracks_cleaned.csv
+data/train
+data/processed
+models/
+logs/

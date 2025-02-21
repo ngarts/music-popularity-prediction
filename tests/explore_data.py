@@ -1,10 +1,5 @@
 import pandas as pd
-from dotenv import load_dotenv
-import os
-
-load_dotenv()
-
-TRAIN_TRACKS_PATH = os.getenv("TRAIN_TRACKS_PATH")
+import constants
 
 # Stampa un separatore per una migliore leggibilità
 def print_section(title):
@@ -13,7 +8,7 @@ def print_section(title):
     print("="*50)
 
 # Carica il dataset
-df = pd.read_csv(TRAIN_TRACKS_PATH)
+df = pd.read_csv(constants.TRAIN_TRACKS_FILENAME)
 
 # Mostra le prime righe
 print_section("Prime righe del dataset")

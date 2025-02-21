@@ -1,37 +1,58 @@
 import os
 import polars as pl
 import subprocess
+from logger import logger
 
-DATA_DIR = "data"
-
-def download_dataset(uri, filename):
-    """Scarica il dataset da Kaggle se non è già presente."""
+def download_dataset(uri, path):
+    """Downloads dataset from Kaggle if it is not already present."""
     
-    if not os.path.exists(filename):
-        print("📥 Downloading dataset from Kaggle...")
+    if not os.path.exists(path):
+        os.makedirs(path)
+
+        logger.info("📥 Downloading dataset from Kaggle...")
         try:
             subprocess.run([
                 "kaggle", "datasets", "download",
                 "-d", uri,
-                "-p", DATA_DIR,
+                "-p", path,
                 "--unzip"
             ], check=True)
-            print("✅ Dataset downloaded successfully!")
+            logger.info("✅ Dataset downloaded successfully!")
+        except subprocess.CalledProcessError as e:
+            logger.error(f"❌ Error downloading dataset: {e}")
+        except FileNotFoundError:
+            logger.error("❌ Kaggle CLI not found. Make sure it is installed and configured.")
         except Exception as e:
-            print(f"❌ Error downloading dataset: {e}")
+            logger.error(f"❌ Unexpected error: {e}")
     else:
-        print("✅ Dataset already exists, skipping download.")
+        logger.info("✅ Dataset already exists, skipping download.")
 
 def extract_csv(filename):
+    """Extracts data from the CSV file."""
     
-    print("📥 Extracting data...")
-    df = pl.read_csv(filename)
-    return df
+    try:
+        logger.info("📥 Extracting data from CSV...")
+        df = pl.read_csv(filename)
+        logger.info("✅ Data extracted successfully!")
+        return df
+    except FileNotFoundError:
+        logger.error(f"❌ File not found: {filename}")
+        return None
+    except Exception as e:
+        logger.error(f"❌ Error reading CSV file: {e}")
+        return None
 
-def extract_kaggle(uri, filename):
-    """Estrae i dati dal file CSV dopo averlo scaricato."""
-    download_dataset(uri, filename)
+def extract_kaggle(uri, path, filename):
+    """Downloads and extracts data from a Kaggle dataset."""
+    
+    download_dataset(uri, path)
     
     df = extract_csv(filename)
+    
+    if df is not None:
+        logger.info("✅ Data extraction completed successfully.")
+    else:
+        logger.warning("⚠️ Data extraction failed.")
+    
     return df
 

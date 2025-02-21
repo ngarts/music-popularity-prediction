@@ -2,44 +2,83 @@ import duckdb
 import polars as pl
 import tensorflow as tf
 import joblib
-import os
 import numpy as np
+import os
+import constants
+from logger import logger
 
-DATA_DIR = "data"
-MODEL_DIR = "models"
-DUCKDB_PATH = os.path.join(DATA_DIR, "music_analysis.duckdb")
-MODEL_PATH = os.path.join(MODEL_DIR, "nn_model.keras")
-SCALER_PATH = os.path.join(MODEL_DIR, "scaler.pkl")
-
-def predict(table_name):
-    """Carica i dati da DuckDB e utilizza il modello AI per predire la popolarità."""
-    print("🎯 Loading data from DuckDB...")
+def predict_from_table(table_name: str) -> pl.DataFrame:
+    """Loads data from DuckDB and uses the AI model to predict music popularity."""
     
-    with duckdb.connect(DUCKDB_PATH, read_only=False) as con:
-        arrow_table = con.execute(f"SELECT id, danceability, energy, tempo, valence, loudness, speechiness, instrumentalness, acousticness, mode, key, duration_ms FROM {table_name}").fetch_arrow_table()
-        df = pl.from_arrow(arrow_table)
-        
-        track_info = df.select(['id'])
-        features = df.drop(['id'])
+    logger.info(f"🎯 Loading data from DuckDB table: {table_name}...")
 
-        print("🧠 Loading AI model...")
-        model = tf.keras.models.load_model(MODEL_PATH)
-        scaler = joblib.load(SCALER_PATH)
-        
-        features_scaled = scaler.transform(features)
+    try:
+        with duckdb.connect(constants.DUCKDB_PATH, read_only=False) as con:
+            # Query the database
+            query = f"""
+                SELECT id, danceability, energy, tempo, valence, loudness, 
+                       speechiness, instrumentalness, acousticness, mode, key, duration_ms 
+                FROM {table_name}
+            """
+            arrow_table = con.execute(query).fetch_arrow_table()
+            df = pl.from_arrow(arrow_table)
 
-        predictions = model.predict(features_scaled)
+            # Check if the table is empty
+            if df.is_empty():
+                logger.error("❌ No data found in the table.")
+                raise ValueError("The table is empty, no data to predict.")
 
-        predicted_classes = np.argmax(predictions, axis=1)
-        results = track_info.with_columns(pl.Series("class", predicted_classes))
+            # Separate track IDs from features
+            track_info = df.select(['id'])
+            features = df.drop(['id'])
 
-        print("✅ Predictions complete! Updating database...")
-        con.execute(f"ALTER TABLE {table_name} ADD COLUMN IF NOT EXISTS class INTEGER;")
-        
-        for row in results.iter_rows(named=True):
-            con.execute(f"UPDATE {table_name} SET class = {row['class']} WHERE id = '{row['id']}'")
-                
-    return results
+            # Load AI model and scaler
+            logger.info("🧠 Loading AI model...")
+
+            if not os.path.exists(constants.MODEL_PATH):
+                logger.error(f"❌ Model file not found: {constants.MODEL_PATH}")
+                raise FileNotFoundError(f"Model file not found: {constants.MODEL_PATH}")
+
+            if not os.path.exists(constants.SCALER_PATH):
+                logger.error(f"❌ Scaler file not found: {constants.SCALER_PATH}")
+                raise FileNotFoundError(f"Scaler file not found: {constants.SCALER_PATH}")
+
+            model = tf.keras.models.load_model(constants.MODEL_PATH)
+            scaler = joblib.load(constants.SCALER_PATH)
+
+            # Normalize feature data
+            features_scaled = scaler.transform(features)
+
+            # Make predictions
+            predictions = model.predict(features_scaled)
+            predicted_classes = np.argmax(predictions, axis=1)
+
+            # Add predictions to DataFrame
+            results = track_info.with_columns(pl.Series("class", predicted_classes))
+            logger.info("✅ Predictions complete! Updating database...")
+
+            # Ensure the 'class' column exists in the table
+            con.execute(f"ALTER TABLE {table_name} ADD COLUMN IF NOT EXISTS class INTEGER;")
+
+            # Batch update predictions in the database
+            con.executemany(
+                f"UPDATE {table_name} SET class = ? WHERE id = ?",
+                [(int(row["class"]), row["id"]) for row in results.iter_rows(named=True)]
+            )
+
+            logger.info("✅ Database successfully updated with predictions.")
+
+            return results
+
+    except duckdb.Error as e:
+        logger.error(f"❌ DuckDB error: {e}")
+        raise
+    except FileNotFoundError as e:
+        logger.error(f"❌ Missing file: {e}")
+        raise
+    except Exception as e:
+        logger.error(f"❌ Unexpected error in predictFromTable: {e}")
+        raise
 
 if __name__ == "__main__":
-    predict("predict_tracks")
+    predict_from_table(constants.PREDICT_TABLE_NAME)

@@ -1,12 +1,9 @@
 import duckdb
-import os
-
-DATA_DIR = "data"
-DUCKDB_PATH = os.path.join(DATA_DIR, "music_analysis.duckdb")  # Percorso del tuo database
+import constants
 
 def check_database(table_name):
     """Verifica il contenuto del database DuckDB"""
-    with duckdb.connect(DUCKDB_PATH, read_only=False) as con:
+    with duckdb.connect(constants.DUCKDB_PATH, read_only=False) as con:
 
         # Elenca tutte le tabelle nel database
         tables = con.execute("SELECT DISTINCT * FROM predict_tracks LIMIT 10").fetch_arrow_table()
@@ -24,6 +21,5 @@ def check_database(table_name):
 
 
 if __name__ == "__main__":
-    # Esegui il controllo
-    check_database("train_tracks")
+    check_database(constants.TRAIN_TABLE_NAME)
     
