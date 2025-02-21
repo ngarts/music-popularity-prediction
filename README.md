@@ -11,41 +11,29 @@ The project follows an **ETL (Extract, Transform, Load) pipeline**, performing d
 
 ## 💂️ Project Structure
 
-📦 music-popularity-prediction
-
-├── 📁 data                 # Dataset storage
-
-│   ├── 📁 predict          # Predict Dataset storage
-
-│       ├── new_tracks.csv  # Tracks for prediction
-
-├── 📁 models               # Trained models
-
+```bash
+my_project/
+│── data/                 # Dataset storage
+│   ├── predict/          # Predict Dataset storage
+│   │   ├── new_tracks.csv  # Tracks for prediction
+│
+│── models/               # Trained models
 │   ├── nn_model.keras      # Trained Neural Network model
-
 │   ├── scaler.pkl          # Scaler for feature normalization
-
-├── 📁 scripts              # Core scripts for data processing
-
+│
+│── scripts/              # Core scripts for data processing
 │   ├── extract.py          # Extracts dataset from Kaggle
-
 │   ├── transform.py        # Cleans and preprocesses data
-
 │   ├── load.py             # Loads data into DuckDB
-
 │   ├── train.py            # Trains the neural network
-
 │   ├── predict.py          # Predicts popularity of new tracks
-
 │   ├── visualize.py        # Generates visual insights
-
 │   ├── train_pl.py         # Starts pipeline to train the model
-
 │   ├── predict_pl.py       # Starts pipeline to predict popularity for new songs
-
-├── 📄 requirements.txt     # Dependencies
-
-├── 📄 README.md            # Project documentation
+│
+│── requirements.txt      # Dependencies
+│── README.md            # Project documentation
+```
 
 ## 🚀 Workflows
 
@@ -114,7 +102,7 @@ It contains **over 600,000 tracks** with metadata and extracted audio features.
 
 \# Clone the repository
 
-git clone <https://github.com/yourusername/music-popularity-prediction.git>
+git clone <https://github.com/ngarts/music-popularity-prediction.git>
 
 cd music-popularity-prediction
 
