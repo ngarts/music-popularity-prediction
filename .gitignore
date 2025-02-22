@@ -172,7 +172,6 @@ cython_debug/
 
 # data
 
-data/train
-data/processed
+data/
+data/
 models/
-logs/

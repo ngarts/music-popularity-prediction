@@ -12,45 +12,93 @@ The project follows an **ETL (Extract, Transform, Load) pipeline**, performing d
 ## 💂️ Project Structure
 
 ```bash
-my_project/
-│── data/                 # Dataset storage
-│   ├── predict/          # Predict Dataset storage
-│   │   ├── new_tracks.csv  # Tracks for prediction
+music-popularity-prediction/
+│── data/                      # Dataset storage
+│   ├── raw/                   # Raw dataset storage
+│   │   ├── tracks.csv         # Original dataset (from Kaggle)
+│   ├── music_analysis.duckdb  # DuckDB database for analysis
 │
-│── models/               # Trained models
-│   ├── nn_model.keras      # Trained Neural Network model
-│   ├── scaler.pkl          # Scaler for feature normalization
+│── models/                    # Trained models
+│   ├── nn_model.keras         # Trained Neural Network model
+│   ├── scaler.pkl             # Scaler for feature normalization
 │
-│── scripts/              # Core scripts for data processing
-│   ├── extract.py          # Extracts dataset from Kaggle
-│   ├── transform.py        # Cleans and preprocesses data
-│   ├── load.py             # Loads data into DuckDB
-│   ├── train.py            # Trains the neural network
-│   ├── predict.py          # Predicts popularity of new tracks
-│   ├── visualize.py        # Generates visual insights
-│   ├── train_pl.py         # Starts pipeline to train the model
-│   ├── predict_pl.py       # Starts pipeline to predict popularity for new songs
+│── scripts/                   # Core scripts for data processing
+│   ├── constants.py           # Project-wide constants
+│   ├── etl_pipeline.py        # Extract, transform, and load (ETL) pipeline
+│   ├── train_pipeline.py      # Model training pipeline
+│   ├── predict_pipeline.py    # Prediction and visualization pipeline
 │
-│── requirements.txt      # Dependencies
-│── README.md            # Project documentation
+│── requirements.txt           # Dependencies list
+│── README.md                  # Project documentation
+
 ```
 
-## 🚀 Workflows
+## 🛠 Technologies Used
 
-### Training workflow
+This project leverages modern **data engineering** and **machine learning** tools to efficiently process and analyze music popularity. Below are the key technologies used:
 
-1️⃣ **Extract** → Downloads dataset from Kaggle.  
-2️⃣ **Transform** → Cleans data, removes unnecessary columns, and normalizes values.  
-3️⃣ **Load** → Stores processed data into a **DuckDB** database.  
-4️⃣ **Train** → Trains a **Neural Network** classifier (Keras) to predict popularity. 
+### **🔹 DuckDB (Database)**
+- A **fast, lightweight** columnar database optimized for analytical workloads.
+- Stores processed **train** and **predict** datasets.
+- Supports **SQL queries** for efficient data retrieval and transformations.
 
-### Predict workflow
+### **🔹 Prefect (Workflow Orchestration)**
+- A **modern workflow management** tool for orchestrating data pipelines.
+- Ensures **task dependency management**, logging, and retry handling.
+- Provides a **scalable and production-ready** pipeline execution framework.
 
-1️⃣ **Extract** → Retrieve local dataset with new songs.  
-2️⃣ **Transform** → Cleans data, removes unnecessary columns, and normalizes values.  
-3️⃣ **Load** → Stores processed data into a **DuckDB** database.   
-5️⃣ **Predict** → Uses the trained model to classify new tracks.  
-6️⃣ **Visualize** → Generates insights via **word clouds, scatter plots, and histograms**.
+### **🔹 TensorFlow/Keras (Machine Learning)**
+- Deep learning framework used for **training a neural network**.
+- Implements **feature normalization**, **oversampling (SMOTE)**, and **model training**.
+- Predicts **track popularity** based on various audio and musical attributes.
+
+### **🔹 Polars & Pandas (Data Processing)**
+- **Polars**: A **high-performance** DataFrame library optimized for large datasets.
+- **Pandas**: Used for compatibility with `train_test_split()` and other ML tasks.
+- Enables **fast transformations, filtering, and feature engineering**.
+
+### **🔹 Matplotlib & Seaborn (Visualization)**
+- **Seaborn**: Generates **data insights** through statistical plots.
+- **Matplotlib**: Custom visualizations for trend analysis.
+- **WordCloud**: Creates a **word cloud** of the most popular track titles.
+
+---
+
+📌 **With these technologies, the project ensures an efficient and scalable approach to music popularity prediction!** 🚀
+
+
+## 🚀 Workflow Overview
+
+### 📌 ETL Workflow (Extract, Transform, Load)
+1️⃣ **Extract** → Downloads dataset from Kaggle *(if not already downloaded)*.  
+2️⃣ **Transform** →  
+   - Cleans data, removes unnecessary columns, and handles missing values.  
+   - Converts **popularity** into categorical classes *(Ice-Cold, Lukewarm, Blazing Hot)*.  
+   - Splits dataset into **Train** (90%) and **Predict** (10%) sets.  
+3️⃣ **Load** → Stores both processed **Train** and **Predict** datasets into a **DuckDB** database.  
+
+---
+
+### 📌 Training Workflow  
+1️⃣ **Load** → Reads the **Train** dataset from **DuckDB**.  
+2️⃣ **Preprocess** →  
+   - Normalizes features using **StandardScaler**.  
+   - Handles **class imbalance** with **SMOTE** *(if needed)*.  
+   - Splits data into **Train-Test** sets *(80% Train, 20% Test)*.  
+3️⃣ **Train** → Trains a **Neural Network** classifier using **TensorFlow/Keras**.  
+4️⃣ **Save** → Exports the trained model (`nn_model.keras`) and the scaler (`scaler.pkl`).  
+
+---
+
+### 📌 Prediction Workflow  
+1️⃣ **Load** → Reads the **Predict** dataset from **DuckDB** *(new unseen tracks)*.  
+2️⃣ **Preprocess** → Normalizes features using the saved **StandardScaler**.  
+3️⃣ **Predict** → Uses the trained **Neural Network** model to classify new tracks into popularity classes.  
+4️⃣ **Store Results** → Updates the **DuckDB** table with the predicted popularity classes.  
+5️⃣ **Visualize** →  
+   - **Class Distribution** → Shows the number of tracks per popularity class.  
+   - **Danceability vs Energy Scatter Plot** → Highlights trends across different classes.  
+   - **Word Cloud (Hits Only)** → Generates a word cloud with only the most popular track titles.  
 
 ## 📊 Dataset & Features
 
@@ -97,6 +145,23 @@ It contains **over 600,000 tracks** with metadata and extracted audio features.
 | **Data Imbalance** | Used compute_class_weight() to balance class distribution |
 | **Overfitting** | Implemented **Dropout layers** (30%, 20%) and **EarlyStopping** |
 | **Normalization Issue** | Ensured StandardScaler() was saved and applied consistently in both training and prediction |
+
+## 💻 System Requirements
+
+To run this project efficiently, ensure that your system meets the following requirements:
+
+### **🔹 Hardware Requirements**
+- 💾 **RAM**: At least **8GB** (16GB recommended for large datasets)
+- 💽 **Disk Space**: At least **2GB** of free storage
+- 🔥 **GPU (Optional)**: Recommended for faster model training with TensorFlow
+
+### **🔹 Software Requirements**
+- 🐍 **Python 3.8+** (recommended: **3.10+**)
+- 💽 **Operating System**: Windows, macOS, or Linux
+- 📦 **Required Libraries**: Install using `requirements.txt`  
+  ```bash
+  pip install -r requirements.txt
+
 
 ## 🛠️ Installation & Setup
 
@@ -160,13 +225,38 @@ kaggle datasets list
 
 ## 🚀 How to Run the Pipelines
 
-### 1️⃣ Train the model
+### 1️⃣ Retrieve the dataset from kaggle 
 
-python scripts/train_pl.py
+```bash
+python scripts/etl_pipeline.py
+```
 
-### 2️⃣ Predict popularity for new songs
+### 2️⃣ Train the model
 
-python scripts/predict_pl.py
+```bash
+python scripts/train_pipeline.py
+```
+
+### 3️⃣ Predict popularity for new songs
+
+```bash
+python scripts/predict_pipeline.py
+```
+
+### 📡 Running Prefect Server & Monitoring Pipelines
+
+Prefect provides a **web-based dashboard** to **monitor and manage workflows** in real time. Follow these steps to start the Prefect server and track your pipeline executions.
+
+#### **1️⃣ Start Prefect Orion Server**
+The **Orion server** is Prefect’s UI for monitoring workflows. Run the following command:
+
+```bash
+prefect server start
+```
+
+Once started, the Prefect dashboard will be accessible at:
+
+🔗 http://127.0.0.1:4200
 
 ## 📈 Results & Visualizations
 
