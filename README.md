@@ -100,21 +100,63 @@ It contains **over 600,000 tracks** with metadata and extracted audio features.
 
 ## 🛠️ Installation & Setup
 
-\# Clone the repository
+### Clone the repository
 
 git clone <https://github.com/ngarts/music-popularity-prediction.git>
 
 cd music-popularity-prediction
 
-\# Create and activate virtual environment
+### Create and activate virtual environment
 
 python -m venv venv
 
 source venv/bin/activate # On Windows: venv\\Scripts\\activate
 
-\# Install dependencies
+### Install dependencies
 
 pip install -r requirements.txt
+
+## 🔑 Kaggle API Setup
+
+To download datasets from Kaggle, you need to configure your **Kaggle API key**.
+
+### **1️⃣ Download your `kaggle.json` API key**
+1. Go to your **[Kaggle Account Settings](https://www.kaggle.com/settings)**.
+2. Scroll down to **API** and click **"Create New API Token"**.
+3. The file **`kaggle.json`** will be downloaded automatically.
+
+### **2️⃣ Move `kaggle.json` to the correct location**
+Move the downloaded file to your Kaggle API directory:
+
+#### **On Windows (PowerShell)**
+```powershell
+mkdir C:\Users\$env:USERNAME\.kaggle -ErrorAction SilentlyContinue
+Move-Item -Path "$HOME\Downloads\kaggle.json" -Destination "$HOME\.kaggle\"
+```
+#### **On Linux/macOS (Bash)**
+```bash
+mkdir -p ~/.kaggle
+mv ~/Downloads/kaggle.json ~/.kaggle/
+```
+
+### **3️⃣ Set Correct Permissions**
+To ensure the file is secure, set proper read permissions:
+
+#### **On Linux/macOS**
+```bash
+chmod 600 ~/.kaggle/kaggle.json
+```
+#### **On Windows (PowerShell)**
+```powershell
+icacls "$HOME\.kaggle\kaggle.json" /grant %USERNAME%:R
+```
+
+### **4️⃣ Verify Installation**
+To check if the API key is working, run:
+```bash
+kaggle datasets list
+```
+✅ If you see a list of datasets, your Kaggle API is configured correctly!
 
 ## 🚀 How to Run the Pipelines
 

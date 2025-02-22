@@ -1,7 +1,8 @@
 import os
 import polars as pl
-import subprocess
+import kaggle
 from logger import logger
+import constants
 
 def download_dataset(uri, path):
     """Downloads dataset from Kaggle if it is not already present."""
@@ -11,19 +12,11 @@ def download_dataset(uri, path):
 
         logger.info("📥 Downloading dataset from Kaggle...")
         try:
-            subprocess.run([
-                "kaggle", "datasets", "download",
-                "-d", uri,
-                "-p", path,
-                "--unzip"
-            ], check=True)
+            kaggle.api.dataset_download_files(uri, path=path, unzip=True)
             logger.info("✅ Dataset downloaded successfully!")
-        except subprocess.CalledProcessError as e:
-            logger.error(f"❌ Error downloading dataset: {e}")
-        except FileNotFoundError:
-            logger.error("❌ Kaggle CLI not found. Make sure it is installed and configured.")
         except Exception as e:
-            logger.error(f"❌ Unexpected error: {e}")
+            logger.error(f"❌ Error downloading dataset: {e}")
+            raise
     else:
         logger.info("✅ Dataset already exists, skipping download.")
 
@@ -55,4 +48,7 @@ def extract_kaggle(uri, path, filename):
         logger.warning("⚠️ Data extraction failed.")
     
     return df
+    
+if __name__ == "__main__":
+    extract_kaggle(constants.TRAIN_TRACKS_URI, constants.DATA_TRAIN_DIR, constants.TRAIN_TRACKS_FILENAME)
 
