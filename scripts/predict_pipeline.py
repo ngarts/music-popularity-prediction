@@ -64,7 +64,7 @@ def predict_data(track_info, features, table_name: str) -> pl.DataFrame:
         model = tf.keras.models.load_model(constants.MODEL_PATH)
         scaler = joblib.load(constants.SCALER_PATH)
 
-        features_scaled = scaler.transform(features)
+        features_scaled = scaler.transform(features.to_numpy())
         predictions = model.predict(features_scaled)
         predicted_classes = np.argmax(predictions, axis=1)
 
@@ -72,11 +72,14 @@ def predict_data(track_info, features, table_name: str) -> pl.DataFrame:
         logger.info("✅ Predictions complete! Updating database...")
 
         with duckdb.connect(constants.DUCKDB_PATH, read_only=False) as con:
+            con.execute("CREATE TEMP TABLE temp_results AS SELECT * FROM results")
             con.execute(f"ALTER TABLE {table_name} ADD COLUMN IF NOT EXISTS class INTEGER;")
-            con.executemany(
-                f"UPDATE {table_name} SET class = ? WHERE id = ?",
-                [(int(row["class"]), row["id"]) for row in results.iter_rows(named=True)]
-            )
+            con.execute(f"""
+                UPDATE {table_name} 
+                SET class = temp_results.class
+                FROM temp_results 
+                WHERE {table_name}.id = temp_results.id
+            """)
 
         logger.info("✅ Database successfully updated with predictions.")
 
