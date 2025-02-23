@@ -12,6 +12,7 @@ from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
 import joblib
 from tensorflow.keras.layers import Dense, Dropout
+from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score
 
 @task(name="train-load-data")
 def load_data(table_name: str) -> pl.DataFrame:
@@ -103,7 +104,7 @@ def split_dataset(X: np.ndarray, y: np.ndarray) -> tuple[np.ndarray, np.ndarray,
 
 
 @task(name="train-model")
-def train_model(X_train: np.ndarray, X_test: np.ndarray, y_train: np.ndarray, y_test: np.ndarray, class_weights: dict):
+def train_model(X_train: np.ndarray, X_test: np.ndarray, y_train: np.ndarray, y_test: np.ndarray, class_weights: dict) -> tf.keras.Sequential:
     """Trains an AI model to predict music popularity."""
 
     logger = get_run_logger() 
@@ -139,16 +140,43 @@ def train_model(X_train: np.ndarray, X_test: np.ndarray, y_train: np.ndarray, y_
         model.save(constants.MODEL_PATH)
         logger.info("✅ Model saved successfully!")
 
+        return model
+
     except Exception as e:
         logger.error(f"❌ Error during model training: {e}")
         raise
+
+@task(name="train-validate-model")
+def validate_model(model: tf.keras.Sequential, X_test: np.ndarray, y_test: np.ndarray):
+
+    logger = get_run_logger() 
+    logger.info("🚀 Starting model validation...")
+    
+    # Prediction on test data
+    y_pred = model.predict(X_test)
+    y_pred_classes = np.argmax(y_pred, axis=1)
+    y_true_classes = np.argmax(y_test, axis=1)
+
+    # Metrics estimation
+    accuracy = accuracy_score(y_true_classes, y_pred_classes)
+    precision = precision_score(y_true_classes, y_pred_classes, average="weighted")
+    recall = recall_score(y_true_classes, y_pred_classes, average="weighted")
+    f1 = f1_score(y_true_classes, y_pred_classes, average="weighted")
+
+    # Results logging
+    logger.info(f"📊 Model Evaluation:")
+    logger.info(f"✅ Accuracy: {accuracy:.4f}")
+    logger.info(f"✅ Precision: {precision:.4f}")
+    logger.info(f"✅ Recall: {recall:.4f}")
+    logger.info(f"✅ F1-score: {f1:.4f}")
 
 @flow(name="train-pipeline")
 def train_pipeline():
     df = load_data(constants.DATA_TRAIN_TABLENAME)
     X, y, class_weights = transform_data(df)
     X_train, X_test, y_train, y_test = split_dataset(X, y)
-    train_model(X_train, X_test, y_train, y_test, class_weights)
+    model = train_model(X_train, X_test, y_train, y_test, class_weights)
+    validate_model(model, X_test, y_test)
 
 if __name__ == "__main__":
     train_pipeline()

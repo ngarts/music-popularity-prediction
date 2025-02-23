@@ -86,7 +86,9 @@ This project leverages modern **data engineering** and **machine learning** tool
    - Handles **class imbalance** with **SMOTE** *(if needed)*.  
    - Splits data into **Train-Test** sets *(80% Train, 20% Test)*.  
 3️⃣ **Train** → Trains a **Neural Network** classifier using **TensorFlow/Keras**.  
-4️⃣ **Save** → Exports the trained model (`nn_model.keras`) and the scaler (`scaler.pkl`).  
+4️⃣ **Save** → Exports the trained model (`nn_model.keras`) and the scaler (`scaler.pkl`).
+5️⃣ **Validate performance** → using Accuracy, Precision, Recall, and F1-score  
+ 
 
 ---
 
@@ -145,6 +147,20 @@ It contains **over 600,000 tracks** with metadata and extracted audio features.
 | **Data Imbalance** | Used compute_class_weight() to balance class distribution |
 | **Overfitting** | Implemented **Dropout layers** (30%, 20%) and **EarlyStopping** |
 | **Normalization Issue** | Ensured StandardScaler() was saved and applied consistently in both training and prediction |
+
+## 📊 Model Evaluation Metrics
+
+After training, our model is evaluated using key classification metrics:
+
+| Metric      | Value  | Description |
+|------------|--------|-------------|
+| 🎯 **Accuracy**  | `0.6722` | Percentage of correctly classified samples |
+| 🎯 **Precision** | `0.6639` | Probability that a predicted class is correct |
+| 🎯 **Recall**    | `0.6722` | Percentage of actual classes correctly identified |
+| 🎯 **F1-score**  | `0.6663` | Balance between precision and recall |
+
+These metrics provide a **comprehensive assessment** of model performance, ensuring that our neural network effectively categorizes track popularity based on Spotify's features.
+
 
 ## 💻 System Requirements
 
